@@ -57,6 +57,10 @@ class GlogConan(ConanFile):
         tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
                               "set_target_properties (glog PROPERTIES POSITION_INDEPENDENT_CODE ON)",
                               "")
+        if tools.Version(self.version) == "0.5.0":
+            tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
+                                  "check_symbol_exists (snprintf cstdio HAVE_SNPRINTF)",
+                                  "check_symbol_exists (snprintf stdio.h HAVE_SNPRINTF)")
 
     def _configure_cmake(self):
         if self._cmake:
