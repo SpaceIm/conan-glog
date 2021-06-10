@@ -26,7 +26,7 @@ class GlogConan(ConanFile):
         "with_threads": True,
     }
 
-    exports_sources = "CMakeLists.txt"
+    exports_sources = ["CMakeLists.txt", "patches/**"]
     generators = "cmake", "cmake_find_package"
     _cmake = None
 
@@ -53,14 +53,12 @@ class GlogConan(ConanFile):
                   destination=self._source_subfolder, strip_root=True)
 
     def _patch_sources(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
         # do not force PIC
         tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
                               "set_target_properties (glog PROPERTIES POSITION_INDEPENDENT_CODE ON)",
                               "")
-        if tools.Version(self.version) == "0.5.0":
-            tools.replace_in_file(os.path.join(self._source_subfolder, "CMakeLists.txt"),
-                                  "check_symbol_exists (snprintf cstdio HAVE_SNPRINTF)",
-                                  "check_symbol_exists (snprintf stdio.h HAVE_SNPRINTF)")
 
     def _configure_cmake(self):
         if self._cmake:
