@@ -64,6 +64,10 @@ class GlogConan(ConanFile):
         self._cmake = CMake(self)
         self._cmake.definitions["WITH_GFLAGS"] = self.options.with_gflags
         self._cmake.definitions["WITH_THREADS"] = self.options.with_threads
+        if tools.Version(self.version) >= "0.5.0":
+            self._cmake.definitions["WITH_PKGCONFIG"] = True
+            self._cmake.definitions["WITH_SYMBOLIZE"] = True
+            self._cmake.definitions["WITH_UNWIND"] = True
         self._cmake.definitions["BUILD_TESTING"] = False
         self._cmake.configure()
         return self._cmake
@@ -78,6 +82,7 @@ class GlogConan(ConanFile):
         cmake = self._configure_cmake()
         cmake.install()
         tools.rmdir(os.path.join(self.package_folder, "lib", "cmake"))
+        tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
 
     def package_info(self):
         self.cpp_info.names["cmake_find_package"] = "glog"
